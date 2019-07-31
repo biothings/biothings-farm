@@ -1,6 +1,12 @@
+package:
+	mkdir package
+
+pack: package
+	pip install --target ./package -r requirements.txt
+
 fullzip:
 	# pip install --target ./package mypackage to add more
-	cd package && zip -r9 ${OLDPWD}/function.zip .
+	cd package && zip -r9 ../function.zip .
 	zip -g function.zip function.py
 
 zip:

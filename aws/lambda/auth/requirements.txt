@@ -1,0 +1,4 @@
+arnparse
+requests
+jose
+boto3
