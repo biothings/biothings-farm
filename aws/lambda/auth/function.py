@@ -114,11 +114,11 @@ def lambda_handler(event, context):
         # Verify and get information from token
         # it can be in headers or as qs
         token = ""
-        if event.get("headers",{}).get("authorization"):
-            token = event["headers"]['authorization']
-        elif event.get("queryStringParameters",{}).get("auth"):
-            token = event["queryStringParameters"]["auth"]
-        assert token, "No auth token found"
+        if event.get("headers",{}).get("x-biothings-access-token"):
+            token = event["headers"]['x-biothings-access-token']
+        elif event.get("queryStringParameters",{}).get("token"):
+            token = event["queryStringParameters"]["token"]
+        assert token, "No auth token found in event: %s" % repr(event)
         #print("token: %s" % token)
         claims = is_token_valid(token)
         #print(claims)
@@ -135,8 +135,8 @@ def lambda_handler(event, context):
     except Exception as err:
         # Deny access if the token is invalid
         print("General error: %s" % err)
-        #import logging
-        #logging.exception(err)
+        import logging
+        logging.exception(err)
         return generatePolicy(None, 'Deny', event.get('methodArn',"arn:null"))
  
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
     # for testing locally you can enter the JWT ID Token here
     t = """eyJraWQiOiJpNGhTMDd2ZDBvQmowdGV5K05wTnVKQWd2VVhUVTF2Qm9tRVQ3dHVhRStFPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyM2Q5MWI2Yi04YzFhLTRlMGUtYWQ4My0wOWIxMmMwNDg1MDgiLCJldmVudF9pZCI6ImVhMWY2OTUxLTY4YjItNDBkYi1hZDJhLTJhNjNkNzZkNTNhMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE1NjQ1OTAxNzEsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX0tBZ2xSU0MxNiIsImV4cCI6MTU2NDU5Mzc3MSwiaWF0IjoxNTY0NTkwMTcxLCJqdGkiOiJjZWQ0NThkMS1hZGZjLTRlYTYtYTBkOS1kZjhkNjdkZDViMzgiLCJjbGllbnRfaWQiOiI2Njhxcjg3ZmM4NzVlbnFhZHZlN280Zm5vNyIsInVzZXJuYW1lIjoiMjNkOTFiNmItOGMxYS00ZTBlLWFkODMtMDliMTJjMDQ4NTA4In0.iUTpOnRMzXf51T2OELMVQALQBDKTfCOfa6lG_t5vIJUAdj9j7_Ww3ULbPUnzk-hOYRYVhJB7i5ydIyViRDurikQMqmXbZ7IOwbFR3hjGa0nGZvekO9M5VPSAall4EOC3GkVVEvsQ4Cx9l2qtKmOv5cPF1pOtCGcQotkDPhzSfy71rbtmB2awyvdbto_aYTWMx8zVbPq37D2EOcRkK-xBq1EONWAJhNo_AEdsKhN6QNDwatf8yAoxJ6cs1MJOZ7iRaJsgy7Mbuwm_EII0IdMyRn6Ndixsxj2puK9fRpzquRbYbrbjIwrFFNer3Cst8UZE6MEeyCalf_GicGvRfmQe_Q"""
     arn = """arn:aws:execute-api:us-west-1:215751090072:g4k1vo9uyi/beta/GET/farm/cgi/build_manager"""
-    event = {"headers" : {'authorization': t}}
+    event = {"headers" : {'x-biothings-access-token': t}}
     event["methodArn"] = arn
     policy = lambda_handler(event, None)
     print(policy)
