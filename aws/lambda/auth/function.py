@@ -76,16 +76,20 @@ def is_token_valid(token):
     if claims['client_id'] != app_client_id:
         print('Token was not issued for this audience')
         return False
+
+    # We need to check if the token has been revoked (signout)
+    # To avoid querying cognito too much ($$$) we'll do that indirectly
+    # when retrieving the user, using that token. If revoked, it'll fail...
+
     # now we can use the claims
     print(claims)
     return claims
 
 
-def is_user_has_permissions(username,methodArn):
-    print("method %s" % methodArn)
+def has_user_permissions(token,methodArn):
     cogidp = boto3.client('cognito-idp')
-    user = cogidp.admin_get_user(UserPoolId=userpool_id,
-                                 Username=username)
+    # get user using his own token, if revoked, we'll throw something bad
+    user = cogidp.get_user(AccessToken=token)
     # extract registered api on user's profile
     attrs = user["UserAttributes"]
     btnames = [a["Value"] for a in attrs if a["Name"] == "custom:biothings-api-name"]
@@ -94,7 +98,8 @@ def is_user_has_permissions(username,methodArn):
     # it can be a comma separated list. comparison will be case-insensitive.
     btnames = [b for b in map(str.lower,map(str.strip,btnames.split(",")))]
     # user has to be confirmed
-    assert user.get("UserStatus") == "CONFIRMED", "User not confirmed"
+    verifs = [a["Value"] for a in attrs if a["Name"] == "email_verified"]
+    assert len(verifs) == 1 and verifs[0] == "true", "User not confirmed"
     # then the resource he's trying to access has to match his own biothings APIs
     arn = arnparse(methodArn)
     # arn resource iooks like "g4k1vo9uyi/beta/GET/farm/cgi/build_manager"
@@ -119,14 +124,12 @@ def lambda_handler(event, context):
         elif event.get("queryStringParameters",{}).get("token"):
             token = event["queryStringParameters"]["token"]
         assert token, "No auth token found in event: %s" % repr(event)
-        #print("token: %s" % token)
         claims = is_token_valid(token)
-        #print(claims)
         if claims:
             print("Token valid")
             # Get principalId from idInformation
             principalId = claims['sub']
-            is_user_has_permissions(principalId,event['methodArn'])
+            has_user_permissions(token,event['methodArn'])
             print("User has permissions")
             return generatePolicy(principalId, 'Allow', event['methodArn'])
 
@@ -144,7 +147,7 @@ def lambda_handler(event, context):
 # AWS Lambda and any other local environments
 if __name__ == '__main__':
     # for testing locally you can enter the JWT ID Token here
-    t = """eyJraWQiOiJpNGhTMDd2ZDBvQmowdGV5K05wTnVKQWd2VVhUVTF2Qm9tRVQ3dHVhRStFPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyM2Q5MWI2Yi04YzFhLTRlMGUtYWQ4My0wOWIxMmMwNDg1MDgiLCJldmVudF9pZCI6ImVhMWY2OTUxLTY4YjItNDBkYi1hZDJhLTJhNjNkNzZkNTNhMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE1NjQ1OTAxNzEsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX0tBZ2xSU0MxNiIsImV4cCI6MTU2NDU5Mzc3MSwiaWF0IjoxNTY0NTkwMTcxLCJqdGkiOiJjZWQ0NThkMS1hZGZjLTRlYTYtYTBkOS1kZjhkNjdkZDViMzgiLCJjbGllbnRfaWQiOiI2Njhxcjg3ZmM4NzVlbnFhZHZlN280Zm5vNyIsInVzZXJuYW1lIjoiMjNkOTFiNmItOGMxYS00ZTBlLWFkODMtMDliMTJjMDQ4NTA4In0.iUTpOnRMzXf51T2OELMVQALQBDKTfCOfa6lG_t5vIJUAdj9j7_Ww3ULbPUnzk-hOYRYVhJB7i5ydIyViRDurikQMqmXbZ7IOwbFR3hjGa0nGZvekO9M5VPSAall4EOC3GkVVEvsQ4Cx9l2qtKmOv5cPF1pOtCGcQotkDPhzSfy71rbtmB2awyvdbto_aYTWMx8zVbPq37D2EOcRkK-xBq1EONWAJhNo_AEdsKhN6QNDwatf8yAoxJ6cs1MJOZ7iRaJsgy7Mbuwm_EII0IdMyRn6Ndixsxj2puK9fRpzquRbYbrbjIwrFFNer3Cst8UZE6MEeyCalf_GicGvRfmQe_Q"""
+    t = """eyJraWQiOiJpNGhTMDd2ZDBvQmowdGV5K05wTnVKQWd2VVhUVTF2Qm9tRVQ3dHVhRStFPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIyM2Q5MWI2Yi04YzFhLTRlMGUtYWQ4My0wOWIxMmMwNDg1MDgiLCJldmVudF9pZCI6IjI0MDhmNWYwLTliYmQtNDg0OS1hNmQ2LTNhY2RkYmRkMzVjOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE1NjQ3ODY4NzUsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy13ZXN0LTIuYW1hem9uYXdzLmNvbVwvdXMtd2VzdC0yX0tBZ2xSU0MxNiIsImV4cCI6MTU2NDc5MDQ3NSwiaWF0IjoxNTY0Nzg2ODc1LCJqdGkiOiIyMzFhMWJkYi1kNWMxLTQwY2EtOGQ2My0zMWY0NTEwM2Y1YzUiLCJjbGllbnRfaWQiOiI2Njhxcjg3ZmM4NzVlbnFhZHZlN280Zm5vNyIsInVzZXJuYW1lIjoiMjNkOTFiNmItOGMxYS00ZTBlLWFkODMtMDliMTJjMDQ4NTA4In0.mW1n7lkuC3DxWCMRwZFEx0kwQrOjGOWdA_uzT9qbqIaEBibcUZzumcPToq_L_9Q-0hAOoaZp3v3P_P6-Fj7jGPcs3RT9pCI_Ei5kUkbDXTcsVqqhroeyEZjF0c3IehUcWq2QCZpQwuNnK3mN2TlvVt2HlG8khbigO5-UUeUtvzBgOfe2xv5o74PBslAloTGElTJRlIB2tCOiZKSlIg7t8jdpRm0X0QtmdYQU2GbXYyz32oQzoSNgjK1D6Qlb5BGM4gbM2fyOonfEpSYW-Uw-XhASFJJuevIvlbX0PH_16UnntqxJoqWwDxLoPgz2iuUA-nNCWgO_7jkZmcgfhcqw9g"""
     arn = """arn:aws:execute-api:us-west-1:215751090072:g4k1vo9uyi/beta/GET/farm/cgi/build_manager"""
     event = {"headers" : {'x-biothings-access-token': t}}
     event["methodArn"] = arn
