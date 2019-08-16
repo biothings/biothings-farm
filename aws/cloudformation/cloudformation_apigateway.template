@@ -1,0 +1,420 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Deploy API Gateway serving Biothings Farm API",
+    "Parameters": {
+        "VPCLinkId": {
+            "Description": "VPC Link ID to link API gateway to Biothings Farm Load Balancer, typically returned when creating infrastructure using CloudFormation (check outputs)",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "farmapi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Body": {
+                    "swagger":"2.0",
+                    "info":{
+                        "version":"2019-08-01T15:41:58Z",
+                        "title":"biothings-farm"
+                    },
+                    "host":"g4k1vo9uyi.execute-api.us-west-2.amazonaws.com",
+                    "basePath":"/beta",
+
+                    "schemes":[
+                        "https"
+                    ],
+
+                    "paths":{
+
+                        "/api":{
+
+                            "options":{
+
+                                "consumes":[
+                                    "application/json"
+                                ],
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "responses":{
+
+                                    "200":{
+                                        "description":"200 response",
+
+                                        "schema":{
+                                            "$ref":"#/definitions/Empty"
+                                        },
+
+                                        "headers":{
+
+                                            "Access-Control-Allow-Origin":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Methods":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Headers":{
+                                                "type":"string"
+                                            }
+                                        }
+                                    }
+                                },
+
+                                "x-amazon-apigateway-integration":{
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200",
+
+                                            "responseParameters":{
+                                                "method.response.header.Access-Control-Allow-Methods":"'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers":"'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin":"'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+
+                                    "requestTemplates":{
+                                        "application/json":"{\"statusCode\":200}"
+                                    },
+                                    "type":"mock"
+                                }
+                            }
+                        },
+
+                        "/api/{proxy+}":{
+
+                            "options":{
+
+                                "consumes":[
+                                    "application/json"
+                                ],
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "responses":{
+
+                                    "200":{
+                                        "description":"200 response",
+
+                                        "schema":{
+                                            "$ref":"#/definitions/Empty"
+                                        },
+
+                                        "headers":{
+
+                                            "Access-Control-Allow-Origin":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Methods":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Headers":{
+                                                "type":"string"
+                                            }
+                                        }
+                                    }
+                                },
+
+                                "x-amazon-apigateway-integration":{
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200",
+
+                                            "responseParameters":{
+                                                "method.response.header.Access-Control-Allow-Methods":"'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers":"'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin":"'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+
+                                    "requestTemplates":{
+                                        "application/json":"{\"statusCode\":200}"
+                                    },
+                                    "type":"mock"
+                                }
+                            },
+
+                            "x-amazon-apigateway-any-method":{
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "parameters":[
+
+                                {
+                                    "name":"proxy",
+                                    "in":"path",
+                                    "required":true,
+                                    "type":"string"
+                                }
+                                ],
+                                "responses":{},
+
+                                "x-amazon-apigateway-integration":{
+                                    "uri":"http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80",
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200"
+                                        }
+                                    },
+
+                                    "requestParameters":{
+                                        "integration.request.path.proxy":"method.request.path.proxy"
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+                                    "connectionType":"VPC_LINK",
+                                    "connectionId": { "Ref" : "VPCLinkId" },
+                                    "httpMethod":"ANY",
+                                    "cacheNamespace":"l6ubsf",
+
+                                    "cacheKeyParameters":[
+                                        "method.request.path.proxy"
+                                    ],
+                                    "type":"http"
+                                }
+                            }
+                        },
+
+                        "/farm":{
+
+                            "x-amazon-apigateway-any-method":{
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "responses":{
+
+                                    "200":{
+                                        "description":"200 response",
+
+                                        "schema":{
+                                            "$ref":"#/definitions/Empty"
+                                        }
+                                    }
+                                },
+
+                                "security":[
+
+                                {
+                                    "biothings-farm-auth":[]
+                                }
+                                ],
+
+                                "x-amazon-apigateway-integration":{
+                                    "uri":"http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80",
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200"
+                                        }
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+                                    "connectionType":"VPC_LINK",
+                                    "connectionId": { "Ref" : "VPCLinkId" },
+                                    "httpMethod":"ANY",
+                                    "type":"http_proxy"
+                                }
+                            }
+                        },
+
+                        "/farm/{proxy+}":{
+
+                            "options":{
+
+                                "consumes":[
+                                    "application/json"
+                                ],
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "responses":{
+
+                                    "200":{
+                                        "description":"200 response",
+
+                                        "schema":{
+                                            "$ref":"#/definitions/Empty"
+                                        },
+
+                                        "headers":{
+
+                                            "Access-Control-Allow-Origin":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Methods":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Credentials":{
+                                                "type":"string"
+                                            },
+
+                                            "Access-Control-Allow-Headers":{
+                                                "type":"string"
+                                            }
+                                        }
+                                    }
+                                },
+
+                                "x-amazon-apigateway-integration":{
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200",
+
+                                            "responseParameters":{
+                                                "method.response.header.Access-Control-Allow-Credentials":"'true'",
+                                                "method.response.header.Access-Control-Allow-Methods":"'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Biothings-Access-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin":"'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+
+                                    "requestTemplates":{
+                                        "application/json":"{\"statusCode\":200}"
+                                    },
+                                    "type":"mock"
+                                }
+                            },
+
+                            "x-amazon-apigateway-any-method":{
+
+                                "produces":[
+                                    "application/json"
+                                ],
+
+                                "parameters":[
+
+                                {
+                                    "name":"proxy",
+                                    "in":"path",
+                                    "required":true,
+                                    "type":"string"
+                                }
+                                ],
+                                "responses":{},
+
+                                "security":[
+
+                                {
+                                    "biothings-farm-auth":[]
+                                }
+                                ],
+
+                                "x-amazon-apigateway-integration":{
+                                    "uri":"http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80/farm/{proxy}",
+
+                                    "responses":{
+
+                                        "default":{
+                                            "statusCode":"200"
+                                        }
+                                    },
+
+                                    "requestParameters":{
+                                        "integration.request.path.proxy":"method.request.path.proxy",
+                                        "integration.request.header.X-Backend":"method.request.path.proxy"
+                                    },
+                                    "passthroughBehavior":"when_no_match",
+                                    "connectionType":"VPC_LINK",
+                                    "connectionId": { "Ref" : "VPCLinkId" },
+                                    "httpMethod":"ANY",
+                                    "cacheNamespace":"r6xmmk",
+
+                                    "cacheKeyParameters":[
+                                        "method.request.path.proxy"
+                                    ],
+                                    "type":"http_proxy"
+                                }
+                            }
+                        }
+                    },
+
+                    "securityDefinitions":{
+
+                        "biothings-farm-auth":{
+                            "type":"apiKey",
+                            "name":"Unused",
+                            "in":"header",
+                            "x-amazon-apigateway-authtype":"custom",
+
+                            "x-amazon-apigateway-authorizer":{
+                                "authorizerUri":"arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:215751090072:function:biothings-farm-cognito-checker/invocations",
+                                "authorizerResultTtlInSeconds":0,
+                                "type":"request"
+                            }
+                        }
+                    },
+
+                    "definitions":{
+
+                        "Empty":{
+                            "type":"object",
+                            "title":"Empty Schema"
+                        }
+                    }
+                },
+                "Name": "biothings-farm",
+                "Parameters": {
+                    "endpointConfigurationTypes": "REGIONAL"
+                }
+            }
+        },
+        "betastage": {
+            "Type": "AWS::ApiGateway::Stage",
+            "Properties": {
+                "StageName": "beta",
+                "Description": "Beta Stage",
+                "RestApiId": {
+                    "Ref": "farmapi"
+                },
+                "DeploymentId": {
+                    "Ref": "apideploy"
+                }
+            }
+        },
+        "apideploy": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "farmapi"
+                },
+                "Description": "Beta Deployment"
+            }
+        }
+    },
+    "Outputs": {
+        "APIGatewayURL": {
+            "Value": {
+                "Ref": "farmapi"
+            },
+            "Description": "The network elastic load balancer Amazon resource name"
+        }
+    }
+}
