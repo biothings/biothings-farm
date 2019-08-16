@@ -4,7 +4,7 @@
     "version": "2019-08-01T15:41:58Z",
     "title": "biothings-farm"
   },
-  "host": "g4k1vo9uyi.execute-api.us-west-1.amazonaws.com",
+  "host": "g4k1vo9uyi.execute-api.us-west-2.amazonaws.com",
   "basePath": "/beta",
   "schemes": [
     "https"
@@ -115,7 +115,7 @@
         ],
         "responses": {},
         "x-amazon-apigateway-integration": {
-          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-1.amazonaws.com:80",
+          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80",
           "responses": {
             "default": {
               "statusCode": "200"
@@ -155,7 +155,7 @@
           }
         ],
         "x-amazon-apigateway-integration": {
-          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-1.amazonaws.com:80",
+          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80",
           "responses": {
             "default": {
               "statusCode": "200"
@@ -237,7 +237,7 @@
           }
         ],
         "x-amazon-apigateway-integration": {
-          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-1.amazonaws.com:80/farm/{proxy}",
+          "uri": "http://biothings-farm-nlb-231da1bde4dd8adc.elb.us-west-2.amazonaws.com:80/farm/{proxy}",
           "responses": {
             "default": {
               "statusCode": "200"

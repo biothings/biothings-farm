@@ -1,0 +1,876 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "vpc0d1855dc753dfb99f": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-vpc"
+          }
+        ]
+      }
+    },
+    "subnet0528d2858f1c13994": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "AvailabilityZone": "us-west-2c",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-subnet-priv1"
+          }
+        ]
+      }
+    },
+    "subnet02965738ecffe4697": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": "us-west-2c",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-subnet-priv2"
+          }
+        ]
+      }
+    },
+    "subnet0268d7d309db38559": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/28",
+        "AvailabilityZone": "us-west-2c",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-subnet-public"
+          }
+        ]
+      }
+    },
+    "igw058b9bfcfb08232d5": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-gw"
+          }
+        ]
+      }
+    },
+    "dopt1a726d78": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "us-west-2.compute.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "acl0099bb0e6e6b73bdf": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-acl-priv2"
+          }
+        ]
+      }
+    },
+    "acl05ceb4de794813b14": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-acl-priv1"
+          }
+        ]
+      }
+    },
+    "acl065bf747250b18204": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-acl-public"
+          }
+        ]
+      }
+    },
+    "rtb0a5a1941224ada7e5": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-rt-priv1"
+          }
+        ]
+      }
+    },
+    "rtb0150c0bc8371055fb": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-rt-priv2"
+          }
+        ]
+      }
+    },
+    "rtb05161db389dc2bc66": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-rt-public"
+          }
+        ]
+      }
+    },
+    "instancei07fa7ef6bd24123a4": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": "ami-04dae37587db4c684",
+        "InstanceType": "t2.large",
+        "KeyName": "biothings_farm",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-node1"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "subnet0528d2858f1c13994"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "10.0.1.96",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgbiothingsfarmnodesg"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "instancei0c35a39f13a2180b2": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": "ami-0fa1d403af627f066",
+        "InstanceType": "t2.nano",
+        "KeyName": "biothings_farm",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-entry"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "subnet0268d7d309db38559"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "10.0.0.5",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgSSHaccess"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "instancei0f69b5ca79811ab9e": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "ImageId": "ami-a275b1c2",
+        "InstanceType": "t2.nano",
+        "KeyName": "biothings_farm",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-nat"
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "subnet0268d7d309db38559"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "10.0.0.10",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sglaunchwizard6"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "sgSSHaccess": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "biothings-farm ssh access public subnet",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-ssh-sg"
+          }
+        ]
+      }
+    },
+    "sglaunchwizard6": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "launch-wizard-6 created 2019-07-23T17:17:20.634-07:00",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-nat-sg"
+          }
+        ]
+      }
+    },
+    "sgbiothingsfarmnodesg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Default security group for BioThings farm nodes",
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "biothings-farm-node-sg"
+          }
+        ]
+      }
+    },
+    "acl1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "10",
+        "PortRange": {
+          "From": "80",
+          "To": "80"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "11",
+        "PortRange": {
+          "From": "443",
+          "To": "443"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl3": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "1",
+        "RuleAction": "allow",
+        "RuleNumber": "12",
+        "Icmp": {
+          "Code": "-1",
+          "Type": "-1"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl4": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/28",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "50",
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl5": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "51",
+        "PortRange": {
+          "From": "0",
+          "To": "0"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl6": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "Icmp": {
+          "Code": "-1",
+          "Type": "-1"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl7": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "5",
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl8": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "10",
+        "PortRange": {
+          "From": "1025",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl9": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/28",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "15",
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        }
+      }
+    },
+    "acl10": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "10",
+        "PortRange": {
+          "From": "80",
+          "To": "80"
+        },
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl11": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "11",
+        "PortRange": {
+          "From": "443",
+          "To": "443"
+        },
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl12": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "1",
+        "RuleAction": "allow",
+        "RuleNumber": "12",
+        "Icmp": {
+          "Code": "-1",
+          "Type": "-1"
+        },
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl13": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/28",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "50",
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl14": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "51",
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl15": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "Icmp": {
+          "Code": "-1",
+          "Type": "-1"
+        },
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl16": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "5",
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl17": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "6",
+        "RuleAction": "allow",
+        "RuleNumber": "10",
+        "PortRange": {
+          "From": "1025",
+          "To": "65535"
+        },
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl18": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/28",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "15",
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        }
+      }
+    },
+    "acl19": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl065bf747250b18204"
+        }
+      }
+    },
+    "acl20": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl065bf747250b18204"
+        }
+      }
+    },
+    "subnetacl1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl0099bb0e6e6b73bdf"
+        },
+        "SubnetId": {
+          "Ref": "subnet02965738ecffe4697"
+        }
+      }
+    },
+    "subnetacl2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl05ceb4de794813b14"
+        },
+        "SubnetId": {
+          "Ref": "subnet0528d2858f1c13994"
+        }
+      }
+    },
+    "subnetacl3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl065bf747250b18204"
+        },
+        "SubnetId": {
+          "Ref": "subnet0268d7d309db38559"
+        }
+      }
+    },
+    "gw1": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw058b9bfcfb08232d5"
+        }
+      }
+    },
+    "subnetroute1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb0a5a1941224ada7e5"
+        },
+        "SubnetId": {
+          "Ref": "subnet0528d2858f1c13994"
+        }
+      }
+    },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb0150c0bc8371055fb"
+        },
+        "SubnetId": {
+          "Ref": "subnet02965738ecffe4697"
+        }
+      }
+    },
+    "subnetroute3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb05161db389dc2bc66"
+        },
+        "SubnetId": {
+          "Ref": "subnet0268d7d309db38559"
+        }
+      }
+    },
+    "route1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb0a5a1941224ada7e5"
+        },
+        "InstanceId": {
+          "Ref": "instancei0f69b5ca79811ab9e"
+        }
+      }
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb0150c0bc8371055fb"
+        },
+        "InstanceId": {
+          "Ref": "instancei0f69b5ca79811ab9e"
+        }
+      }
+    },
+    "route3": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb05161db389dc2bc66"
+        },
+        "GatewayId": {
+          "Ref": "igw058b9bfcfb08232d5"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "dchpassoc1": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc0d1855dc753dfb99f"
+        },
+        "DhcpOptionsId": {
+          "Ref": "dopt1a726d78"
+        }
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgSSHaccess"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "76.88.37.185/32"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgSSHaccess"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "192.26.252.1/32"
+      }
+    },
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sglaunchwizard6"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "10.0.0.0/16"
+      }
+    },
+    "ingress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sglaunchwizard6"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "76.88.37.185/32"
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgbiothingsfarmnodesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "10.0.0.0/16"
+      }
+    },
+    "ingress6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgbiothingsfarmnodesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "10.0.0.0/28"
+      }
+    },
+    "ingress7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgbiothingsfarmnodesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "7080",
+        "ToPort": "7080",
+        "CidrIp": "10.0.0.0/16"
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgbiothingsfarmnodesg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "10.0.0.0/16"
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgSSHaccess"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress2": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sglaunchwizard6"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgbiothingsfarmnodesg"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "Biothings Farm infrastructure setup"
+}
