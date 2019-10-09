@@ -21,7 +21,7 @@ from biothings.utils.loggers import setup_default_log
 #- invisible -#
 LOGGER_NAME = "hub"
 #- invisible -#
-DATA_ARCHIVE_ROOT = "/data/standalone"
+DATA_ARCHIVE_ROOT = "/data/farmhub"
 #- invisible -#
 LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,"logs")
 logger = setup_default_log(LOGGER_NAME, LOG_FOLDER)
