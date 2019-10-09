@@ -1,0 +1,14 @@
+# Main playbook to set up mytaxonomy cluster
+
+- name: Setup Biothings Farm Hub
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars_files:
+    - vars/{{ varfile | default('farm_hub.yml') }}
+
+  tasks:
+    - include: configure.yml
+
+  tags:
+    - configure

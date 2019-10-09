@@ -1,0 +1,109 @@
+##############
+# SSH server #
+##############
+
+- name: ssh
+  apt: name=openssh-server
+  become: yes
+
+
+##################################################
+# Install python virtualenv
+##################################################
+
+- name: Install python3
+  apt: name=python3
+  become: yes
+
+- name: Install pip
+  apt: name=python3-pip
+  become: yes
+
+- name: Install virtualenv
+  pip: name=virtualenv executable=pip3
+  become: yes
+
+###################################################
+# Setup home directory, biothings app codebase
+###################################################
+
+- name: biothings group
+  group: name=biothings
+
+- name: biothings user
+  # biothings/biothings
+  user: name=biothings group=biothings shell=/bin/bash password="$6$ErzOioVY$jPVZ68Lb6eUZ3cy5cYvkrHjXJOQqvyUzBxXa7u2QkQxEZtPcSMeZvoVaJ1BTNAqTEr3Kby6lMMd1kZpQNp/0r1"
+
+- name: Create home directory structure
+  file: path=/home/biothings state=directory owner=biothings group=biothings
+  become_user: "biothings"
+  become: true
+
+- name: Manually create the initial virtualenv
+  command: virtualenv /home/biothings/pyenv -p python3 creates="/home/biothings/pyenv"
+  become_user: "biothings"
+  become: true
+
+- name: bashrc
+  lineinfile: path=/home/biothings/.bashrc line='source $HOME/pyenv/bin/activate'
+  become_user: "biothings"
+  become: true
+
+- name: pythonpath
+  lineinfile: path=/home/biothings/.bashrc line='export PYTHONPATH=.:$PYTHONPATH'
+  become_user: "biothings"
+  become: true
+
+- name: locale
+  lineinfile: path=/home/biothings/.bashrc line='export LC_ALL=C.UTF-8'
+  become_user: "biothings"
+  become: true
+
+# Folders
+- name: logs directory
+  file: path=/data/logs state=directory
+- name: app data directory
+  file: path=/data/{{ app_name }} state=directory owner=biothings group=biothings
+# misc
+- name: run directory
+  file: path=/data/run state=directory owner=biothings group=biothings
+- name: conf directory
+  file: path=/data/conf state=directory
+
+- name: biothings (override requirement_web.txt version)
+  git: repo=https://github.com/biothings/biothings.api.git dest=/home/biothings/biothings.api version={{ software.web_node.biothings_version }}
+  become_user: "biothings"
+  become: true
+
+- name: Install biothings lib requirements into virtualenv
+  shell: "source $HOME/pyenv/bin/activate && pip install .[hub]"
+  args:
+    executable: /bin/bash
+    chdir: /home/biothings/biothings.api
+  become_user: "biothings"
+  become: true
+
+- name: Pull standalone launcher from github repo
+  git: repo=https://github.com/biothings/standalone.git dest=/home/biothings/standalone version={{ software.web_node.standalone_version }}
+  become_user: "biothings"
+  become: true
+
+- name: Pull biothings-farm launcher from github repo
+  git: repo=https://github.com/biothings/biothings-farm.git dest=/home/biothings/biothings-farm version={{ software.web_node.farm_version }}
+  become_user: "biothings"
+  become: true
+
+- name: biothings api as subfolder
+  file: src=/home/biothings/biothings.api/biothings dest=/home/biothings/biothings-farm/src/biothings state=link
+  become_user: "biothings"
+  become: true
+
+- name: Create ssh keys
+  shell: echo "y\n" | ssh-keygen -f /home/biothings/standalone/bin/ssh_host_key -q -N ""
+  become_user: "biothings"
+  become: true
+
+- name: Template out docker entry point
+  template: mode=0755 src=templates/docker-entrypoint.sh dest=/docker-entrypoint.sh
+- name: home bin
+  file: path=/home/biothings/bin state=directory owner=biothings group=biothings
