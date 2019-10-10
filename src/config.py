@@ -11,3 +11,8 @@ ES_HOST = os.environ.get("ES_HOST")
 # to proper reverse proxy, etc.. it has to be unique
 #- invisible -#
 FARM_HUB_ID = os.environ.get("FARM_HUB_ID")
+
+# base URL serving snapshot repo type "url"
+#- invisible -#
+BASE_REPOSITORY_URL = "http://%s:8080" % FARM_HUB_ID
+

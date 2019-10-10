@@ -1,6 +1,7 @@
 from pprint import pformat
 
 from biothings.hub.autoupdate import BiothingsUploader
+from biothings import config
 
 
 class FarmBioThingsUploader(BiothingsUploader):
@@ -44,9 +45,9 @@ class FarmBioThingsUploader(BiothingsUploader):
         # - twice location, because first is the S3 folder containing the json metadata file
         #   and second is coming from archiving the snapshot folder (see bt.h.datarelease.publisher/step_archive())
         # - trailing "/" important, otherwise ES removes it and can't find snapshot data)
-        snapshot_url = "http://%(farm_hub_id)s/%(location)s/%(location)s/" % {
-                "farm_hub_id" : config.FARM_HUB_ID, # unique ID in the farm corresponds to current hub's hostname
-                "location" : location}
+        location = location.strip("/")
+        snapshot_url = ("/".join([config.BASE_REPOSITORY_URL,location,location]) + "/")
         repo_settings = {"type" : "url", "settings" : {"url" : snapshot_url}}
+        self.logger.debug("Repository settings is now: %s" % pformat(repo_settings))
 
         return  (repo_name,repo_settings)
