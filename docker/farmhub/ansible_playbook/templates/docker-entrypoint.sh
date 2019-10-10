@@ -1,19 +1,29 @@
 #!/bin/bash
 
-#set -e
-set -u
+# check env properly set (they come from "docker run -e ...")
+if [ -z "$ES_HOST" ]; then echo ES_HOST not set; exit 1; else : ; fi
+if [ -z "$ES_INDEX_NAME" ]; then echo ES_INDEX_NAME not set; exit 1; else : ; fi
+if [ -z "$FARM_HUB_ID" ]; then echo FARM_HUB_ID not set; exit 1; else : ; fi
 
+# propagate env
+echo "# farm hub env" >> ~biothings/.bashrc
+echo "export ES_HOST=$ES_HOST" >> ~biothings/.bashrc
+echo "export ES_INDEX_NAME=$ES_INDEX_NAME" >> ~biothings/.bashrc
+echo "export FARM_HUB_ID=$FARM_HUB_ID" >> ~biothings/.bashrc
+
+service ssh start
+service nginx start
 
 # Launch hub in a tmux session
 su - biothings -c "
 source ~/pyenv/bin/activate
 cd
 cd standalone && git reset --hard && git pull && pip install -r requirements.txt && cd ..
-cd
+cd biothings-farm && git reset --hard && git pull && cd ..
 # last one to override requirement_web.txt from app
 cd biothings.api && git reset --hard && git pull && pip install -r requirements.txt && cd ..
 tmux new-session -d -s hub
-tmux send-keys 'cd biothings-farm;  python bin/farmhub.py' C-m
+tmux send-keys 'cd biothings-farm/src;  python bin/farmhub.py' C-m
 tmux detach -s hub"
 
 if [ "$?" != "0" ]

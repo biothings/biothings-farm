@@ -1,21 +1,16 @@
 # typical workflow
 # 1. build docker image
-#   make farmhub
+#   make rproxy_farm
 # 2. save/export image
-#   make farmhub save
+#   make rproxy_farm save
 # 3. upload image to S3
-#   make farmhub sends3
+#   make rproxy_farm sends3
 
-biothings_farmhub:
-	docker build \
-    --build-arg BIOTHINGS_GIT_VERSION=release_manager \
-    --build-arg STANDALONE_GIT_VERSION=master \
-    --build-arg FARM_GIT_VERSION=master \
-    --build-arg PROD=1 \
-	-t biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##") .
+rproxy_farm:
+	docker build -t rproxy_farm:$$(git branch | grep ^\* | sed "s#\* ##") .
 
 run:
-	docker run --network biothings_farm --rm --name cgi -e ES_HOST=elastic:9200 -e ES_INDEX_NAME=cgi -e FARM_HUB_ID=cgi -d biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##")
+	docker run --network biothings_farm --rm --name reverse_proxy -p 80:80 -d rproxy_farm:$$(git branch | grep ^\* | sed "s#\* ##")
 
 save:
 	$(eval CONTAINER := $(firstword $(MAKECMDGOALS)))
@@ -27,3 +22,4 @@ sends3:
 	$(eval S3FOLDER := $(subst containers/,,$(CONTAINERFILE)))
 	$(eval S3FOLDER := $(subst .docker,,$(S3FOLDER)))
 	aws s3 cp containers/$(CONTAINERFILE)-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz s3://biothings-containers/biothings_farm/
+

@@ -110,3 +110,4 @@ venv.bak/
 src/biothings
 docker/farmhub/containers/*.docker.xz
 docker/elastic/containers/*.docker.xz
+docker/rproxy/containers/*.docker.xz

@@ -115,7 +115,7 @@
   become: true
 
 - name: Create ssh keys
-  shell: echo "y\n" | ssh-keygen -f /home/biothings/biothings-farm/bin/ssh_host_key -q -N ""
+  shell: echo "y\n" | ssh-keygen -f /home/biothings/biothings-farm/src/bin/ssh_host_key -q -N ""
   become_user: "biothings"
   become: true
 
