@@ -6,6 +6,17 @@
   apt: name=openssh-server
   become: yes
 
+##################################################
+# Install nginx
+##################################################
+
+- name: Template out site conf to server
+  template: src=templates/elastic-url-repo dest=/etc/nginx/sites-enabled/ owner=root group=root mode=0644
+  become: yes
+
+- name: Add json-ld to mime.types
+  replace: regexp="^.*application/json.*$" replace="    application/json                      json jsonld;" dest=/etc/nginx/mime.types owner=root group=root mode=0644
+  become: yes
 
 ##################################################
 # Install python virtualenv
@@ -63,7 +74,7 @@
 - name: logs directory
   file: path=/data/logs state=directory
 - name: app data directory
-  file: path=/data/{{ app_name }} state=directory owner=biothings group=biothings
+  file: path=/data/farmhub state=directory owner=biothings group=biothings
 # misc
 - name: run directory
   file: path=/data/run state=directory owner=biothings group=biothings
@@ -98,8 +109,13 @@
   become_user: "biothings"
   become: true
 
+- name: standalone as subfolder
+  file: src=/home/biothings/standalone dest=/home/biothings/biothings-farm/src/standalone state=link
+  become_user: "biothings"
+  become: true
+
 - name: Create ssh keys
-  shell: echo "y\n" | ssh-keygen -f /home/biothings/standalone/bin/ssh_host_key -q -N ""
+  shell: echo "y\n" | ssh-keygen -f /home/biothings/biothings-farm/bin/ssh_host_key -q -N ""
   become_user: "biothings"
   become: true
 

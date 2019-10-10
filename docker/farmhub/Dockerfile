@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:18.04
 LABEL maintainer "help@biothings.io"
 
 ARG PROD
@@ -10,7 +10,7 @@ RUN if [ -z "$STANDALONE_GIT_VERSION" ]; then echo "NOT SET - use --build-arg ST
 RUN if [ -z "$FARM_GIT_VERSION" ]; then echo "NOT SET - use --build-arg FARM_GIT_VERSION=..."; exit 1; else : ; fi
 
 RUN apt-get -y update
-RUN apt-get install -y apt-utils python-yaml python-jinja2 git python3 apt-transport-https curl bash vim tmux sudo htop ne wget net-tools
+RUN apt-get install -y apt-utils python-yaml python-jinja2 git python3 apt-transport-https curl bash vim tmux sudo htop ne wget net-tools nginx
 RUN git clone http://github.com/ansible/ansible.git /tmp/ansible
 WORKDIR /tmp/ansible
 ENV PATH /tmp/ansible/bin:/sbin:/usr/sbin:/usr/bin:/bin:/usr/local/bin

@@ -108,4 +108,5 @@ venv.bak/
 
 # symlink biothings
 src/biothings
-docker/containers/*.docker.xz
+docker/farmhub/containers/*.docker.xz
+docker/elastic/containers/*.docker.xz

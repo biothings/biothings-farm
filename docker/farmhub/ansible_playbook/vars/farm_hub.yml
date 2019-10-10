@@ -1,6 +1,7 @@
-app_name: farmhub
 software:
   web_node:
     biothings_version: "{{ biothings_git_version | default('master')}}"
     standalone_version: "{{ standalone_git_version | default('master')}}"
     farm_version: "{{ farm_git_version | default('master') }}"
+    nginx:
+      apt_repository: "ppa:nginx/stable"

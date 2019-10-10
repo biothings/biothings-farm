@@ -13,7 +13,7 @@ cd
 # last one to override requirement_web.txt from app
 cd biothings.api && git reset --hard && git pull && pip install -r requirements.txt && cd ..
 tmux new-session -d -s hub
-tmux send-keys 'cd standalone;  python bin/autohub.py ~/biothings-farm/src' C-m
+tmux send-keys 'cd biothings-farm;  python bin/farmhub.py' C-m
 tmux detach -s hub"
 
 if [ "$?" != "0" ]
