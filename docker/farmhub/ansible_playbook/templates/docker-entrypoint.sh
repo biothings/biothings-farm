@@ -23,8 +23,19 @@ cd biothings-farm && git reset --hard && git pull && cd ..
 # last one to override requirement_web.txt from app
 cd biothings.api && git reset --hard && git pull && pip install -r requirements.txt && cd ..
 tmux new-session -d -s hub
-tmux send-keys 'cd biothings-farm/src;  python bin/farmhub.py' C-m
+tmux send-keys 'cd ~/biothings-farm/src;  python bin/farmhub.py' C-m
 tmux detach -s hub"
+
+echo Waiting for Farm Hub $FARM_HUB_ID  to start
+sleep 5
+# check port if hub runs
+netstat -tnlp
+netstat -tnlp | grep 7080
+if [ "$?" != "0" ]
+then
+    echo "Unable to start hub"
+    exit 255
+fi
 
 if [ "$?" != "0" ]
 then
@@ -51,12 +62,9 @@ else
   #       Not sure about that, but maybe when any command is passed to container,
   #       it should be executed *always* after supervisord? And when the command ends,
   #       container exits as well.
-  echo "not interactive"
   if [[ $@ ]]; then 
     eval $@
   fi
-  echo "onela"
   ps auxgww
   tail -f /dev/null
 fi
-
