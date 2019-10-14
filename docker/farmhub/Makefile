@@ -15,7 +15,7 @@ biothings_farmhub:
 	-t biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##") .
 
 run:
-	docker run --network biothings_farm --rm --name cgi -e ES_HOST=elastic:9200 -e ES_INDEX_NAME=cgi -e FARM_HUB_ID=cgi -d biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##")
+	docker run --network biothings_farm --rm --name cgi -e ES_HOST=elastic:9200 -e FARM_HUB_ID=cgi -d biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##")
 
 save:
 	$(eval CONTAINER := $(firstword $(MAKECMDGOALS)))

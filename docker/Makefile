@@ -36,7 +36,7 @@ deploy: network download run
 hub:
 	$(eval FARM_HUB_ID := $(lastword $(MAKECMDGOALS)))
 	@echo Starting container for Farm Hub $(FARM_HUB_ID)
-	docker run --network biothings_farm --rm --name $(FARM_HUB_ID) -e ES_HOST=elastic:9200 -e ES_INDEX_NAME=$(FARM_HUB_ID) -e FARM_HUB_ID=$(FARM_HUB_ID) -d biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##")
+	docker run --network biothings_farm --rm --name $(FARM_HUB_ID) -e ES_HOST=elastic:9200 -e FARM_HUB_ID=$(FARM_HUB_ID) -d biothings_farmhub:$$(git branch | grep ^\* | sed "s#\* ##")
 
 %:
 	@: # catch arg to "hub" target and do nothing to prevent error message

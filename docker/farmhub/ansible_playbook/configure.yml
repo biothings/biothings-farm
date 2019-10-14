@@ -114,6 +114,11 @@
   become_user: "biothings"
   become: true
 
+- name: Template out config.py file
+  template: owner=biothings group=biothings mode=0640 src=templates/config.py dest=/home/biothings/biothings-farm/src/config.py
+  become_user: "biothings"
+  become: true
+
 - name: Create ssh keys
   shell: echo "y\n" | ssh-keygen -f /home/biothings/biothings-farm/src/bin/ssh_host_key -q -N ""
   become_user: "biothings"

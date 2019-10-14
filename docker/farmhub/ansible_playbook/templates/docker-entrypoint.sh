@@ -2,13 +2,11 @@
 
 # check env properly set (they come from "docker run -e ...")
 if [ -z "$ES_HOST" ]; then echo ES_HOST not set; exit 1; else : ; fi
-if [ -z "$ES_INDEX_NAME" ]; then echo ES_INDEX_NAME not set; exit 1; else : ; fi
 if [ -z "$FARM_HUB_ID" ]; then echo FARM_HUB_ID not set; exit 1; else : ; fi
 
 # propagate env
 echo "# farm hub env" >> ~biothings/.bashrc
 echo "export ES_HOST=$ES_HOST" >> ~biothings/.bashrc
-echo "export ES_INDEX_NAME=$ES_INDEX_NAME" >> ~biothings/.bashrc
 echo "export FARM_HUB_ID=$FARM_HUB_ID" >> ~biothings/.bashrc
 
 service ssh start
