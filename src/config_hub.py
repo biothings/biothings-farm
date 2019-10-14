@@ -59,9 +59,9 @@ VERSION_URLS = []
 from biothings import ConfigurationError
 
 #- invisible -#
-ES_INDEX_NAME = ConfigurationError("Define index name holding release data")
+ES_INDEX_NAME = os.environ.get("ES_INDEX_NAME",ConfigurationError("Define index name holding release data"))
 #- invisible -#
-ES_HOST = ConfigurationError("Define ElasticSearch host where release data is updated")
+ES_HOST = os.environ.get("ES_HOST",ConfigurationError("Define ElasticSearch host where release data is updated"))
 #- invisible -#
 # placeholder
 ES_DOC_TYPE = None
@@ -78,6 +78,14 @@ HUB_SSH_PORT = 7022
 HUB_API_PORT = 7080
 #- invisible -#
 HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
+# Farm Hub ID: unique amongst all the biothings farm nodes
+# Used to set container hostname, api gateway uses it to forward request
+# to proper reverse proxy, etc.. it has to be unique
+#- invisible -#
+FARM_HUB_ID = os.environ.get("FARM_HUB_ID",ConfigurationError("Define farm hub unique ID"))
+# base URL serving snapshot repo type "url"
+#- invisible -#
+BASE_REPOSITORY_URL = "http://%s:8080" % FARM_HUB_ID
 
 #* *#
 # By default, a sanity check is performed to make sure hub is running
