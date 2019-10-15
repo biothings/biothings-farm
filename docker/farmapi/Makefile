@@ -1,0 +1,28 @@
+# typical workflow
+# 1. build docker image
+#   make farmapi
+# 2. save/export image
+#   make farmapi save
+# 3. upload image to S3
+#   make farmapi sends3
+
+biothings_farmapi:
+	docker build \
+    --build-arg BIOTHINGS_GIT_VERSION=release_manager \
+    --build-arg FARM_GIT_VERSION=master \
+    --build-arg PROD=1 \
+	-t biothings_farmapi:$$(git branch | grep ^\* | sed "s#\* ##") .
+
+run:
+	docker run --network biothings_farm --rm --name cgi -e ES_HOST=elastic:9200 -d biothings_farmapi:$$(git branch | grep ^\* | sed "s#\* ##")
+
+save:
+	$(eval CONTAINER := $(firstword $(MAKECMDGOALS)))
+	docker save $(CONTAINER):$$(git branch | grep ^\* | sed "s#\* ##") | xz > containers/$(CONTAINER)-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz
+
+sends3:
+	$(eval CONTAINERFILE := $(firstword $(MAKECMDGOALS)))
+	# must be some easier way...
+	$(eval S3FOLDER := $(subst containers/,,$(CONTAINERFILE)))
+	$(eval S3FOLDER := $(subst .docker,,$(S3FOLDER)))
+	aws s3 cp containers/$(CONTAINERFILE)-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz s3://biothings-containers/biothings_farm/

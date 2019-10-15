@@ -21,6 +21,7 @@ download:
 	wget https://biothings-containers.s3-us-west-2.amazonaws.com/biothings_farm/rproxy_farm-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz -O - | unxz - | docker load
 	wget https://biothings-containers.s3-us-west-2.amazonaws.com/biothings_farm/elastic_farm-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz -O - | unxz - | docker load
 	wget https://biothings-containers.s3-us-west-2.amazonaws.com/biothings_farm/biothings_farmhub-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz -O - | unxz - | docker load
+	wget https://biothings-containers.s3-us-west-2.amazonaws.com/biothings_farm/biothings_farmapi-$$(git branch | grep ^\* | sed "s#\* ##").docker.xz -O - | unxz - | docker load
 
 network:
 	docker network ls | grep biothings_farm || docker network create biothings_farm
@@ -28,6 +29,7 @@ network:
 run:
 	docker run --network biothings_farm --rm --name rproxy -p 7080:7080 -d rproxy_farm:$$(git branch | grep ^\* | sed "s#\* ##")
 	docker run --network biothings_farm --rm --name elastic -p 9200:9200 -d elastic_farm:$$(git branch | grep ^\* | sed "s#\* ##")
+	docker run --network biothings_farm --rm --name farmapi -p 8000:8000 -e ES_HOST=elastic:9200 -d biothings_farmapi:$$(git branch | grep ^\* | sed "s#\* ##")
 
 deploy: network download run
 
