@@ -59,8 +59,6 @@ VERSION_URLS = []
 from biothings import ConfigurationError
 
 #- invisible -#
-ES_INDEX_NAME = os.environ.get("ES_INDEX_NAME",ConfigurationError("Define index name holding release data"))
-#- invisible -#
 ES_HOST = os.environ.get("ES_HOST",ConfigurationError("Define ElasticSearch host where release data is updated"))
 #- invisible -#
 # placeholder
@@ -98,5 +96,15 @@ SKIP_CHECK_COMPAT = False
 HUB_NAME = "BioThings Hub"
 # URL to icon representing this BioThings Hub
 HUB_ICON = "https://biothings.io/static/img/biothings-studio-color.svg"
+
+#- invisible -#
+# This "hard-codes" which ES host and index this hub can deal with
+# it's not, and should *not* be made  editable.
+STANDALONE_CONFIG = {
+        "_default" : {
+            "es_host" : ES_HOST,
+            "index" : FARM_HUB_ID, # docker hostname == index name, restricting access
+            }
+        }
 
 CONFIG_READONLY = False

@@ -16,7 +16,6 @@ from standalone.utils.version import set_standalone_version
 # sanity check, making sure farm hub is properly restricted to
 # ES host, index, etc...
 assert config.ES_HOST, "ES_HOST must be set"
-assert config.ES_INDEX_NAME, "ES_INDEX_NAME must be set"
 assert config.FARM_HUB_ID, "FARM_HUB_ID must be set"
 
 # fill app & autohub versions
